@@ -69,8 +69,8 @@
         function createSnowflake() {
             const x = Math.random() * width; // Horizontal position
             const y = Math.random() * -height; // Start above the screen
-            const size = Math.random() * 20 + 10; // Random size (10px to 30px)
-            const speed = Math.random() * 2 + 1; // Medium speed
+            const size = Math.random() * 20 + 15; // Random size (15px to 35px)
+            const speed = Math.random() * 1.5 + 0.5; // Slower speed (0.5px to 2px per frame)
             const image = snowflakeImages[Math.floor(Math.random() * snowflakeImages.length)]; // Random snowflake image
             snowflakes.push({ x, y, size, speed, image });
         }
@@ -91,7 +91,7 @@
 
         // Animation loop
         function loop() {
-            if (Math.random() < 0.02) createSnowflake(); // Spawn snowflakes at controlled rate
+            if (Math.random() < 0.015) createSnowflake(); // Spawn snowflakes at a controlled rate
             drawSnowflakes();
             requestAnimationFrame(loop);
         }
