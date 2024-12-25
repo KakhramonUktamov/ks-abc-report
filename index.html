@@ -3,12 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Power BI with Snow Animation</title>
+    <title>Power BI with Starry Snow Animation</title>
     <style>
         body {
             margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             background-color: #ffffff;
         }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         .snow {
             position: fixed;
             top: 0;
@@ -21,23 +35,22 @@
     </style>
 </head>
 <body>
+    <!-- Power BI Report Embed -->
     <iframe 
         src="https://app.powerbi.com/reportEmbed?reportId=d7221674-484d-4b95-a35c-5b3b10f8eae6&autoAuth=true&ctid=50c9fda0-ee60-41b9-a39c-b3ffe7f1dd6a" 
-        width="100%" 
-        height="100%" 
-        frameborder="0">
+        allowfullscreen>
     </iframe>
 
     <!-- Snow Animation -->
     <canvas class="snow"></canvas>
 
     <script>
-        // Snow animation script
         const canvas = document.querySelector('.snow');
         const ctx = canvas.getContext('2d');
         const snowflakes = [];
         let width, height;
 
+        // Resize canvas to fit screen
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
@@ -45,30 +58,54 @@
         window.addEventListener('resize', resize);
         resize();
 
+        // Create a snowflake with star shape
         function createSnowflake() {
-            const x = Math.random() * width;
-            const y = Math.random() * -height;
-            const size = Math.random() * 3 + 2;
-            const speed = Math.random() * 3 + 1;
+            const x = Math.random() * width; // Random horizontal position
+            const y = Math.random() * -height; // Start slightly above the screen
+            const size = Math.random() * 8 + 5; // Varying sizes (5px to 13px)
+            const speed = Math.random() * 2 + 1; // Medium speed
             snowflakes.push({ x, y, size, speed });
         }
 
+        // Draw star-like snowflakes
         function drawSnowflakes() {
-            ctx.clearRect(0, 0, width, height);
+            ctx.clearRect(0, 0, width, height); // Clear canvas
             snowflakes.forEach((snowflake, index) => {
-                snowflake.y += snowflake.speed;
+                snowflake.y += snowflake.speed; // Move snowflake downwards
+
+                // Draw star
                 ctx.beginPath();
-                ctx.arc(snowflake.x, snowflake.y, snowflake.size, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffffff';
+                const spikes = 5; // Number of star spikes
+                const outerRadius = snowflake.size;
+                const innerRadius = snowflake.size / 2;
+                let rotation = Math.PI / 2 * 3; // Start at the top
+                let x = snowflake.x;
+                let y = snowflake.y;
+                ctx.moveTo(x, y - outerRadius);
+
+                for (let i = 0; i < spikes; i++) {
+                    x = snowflake.x + Math.cos(rotation) * outerRadius;
+                    y = snowflake.y + Math.sin(rotation) * outerRadius;
+                    ctx.lineTo(x, y);
+                    rotation += Math.PI / spikes;
+
+                    x = snowflake.x + Math.cos(rotation) * innerRadius;
+                    y = snowflake.y + Math.sin(rotation) * innerRadius;
+                    ctx.lineTo(x, y);
+                    rotation += Math.PI / spikes;
+                }
+                ctx.closePath();
+                ctx.fillStyle = '#ffffff'; // Snowflake color
                 ctx.fill();
 
-                // Remove snowflake if it's out of view
+                // Remove snowflake if it goes out of the screen
                 if (snowflake.y > height) snowflakes.splice(index, 1);
             });
         }
 
+        // Animation loop
         function loop() {
-            createSnowflake();
+            if (Math.random() < 0.02) createSnowflake(); // Control the amount of snowflakes
             drawSnowflakes();
             requestAnimationFrame(loop);
         }
