@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI with Snow Animation</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #ffffff;
+        }
+        .snow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <iframe 
+        src="https://app.powerbi.com/reportEmbed?reportId=d7221674-484d-4b95-a35c-5b3b10f8eae6&autoAuth=true&ctid=50c9fda0-ee60-41b9-a39c-b3ffe7f1dd6a" 
+        width="100%" 
+        height="100%" 
+        frameborder="0">
+    </iframe>
+
+    <!-- Snow Animation -->
+    <canvas class="snow"></canvas>
+
+    <script>
+        // Snow animation script
+        const canvas = document.querySelector('.snow');
+        const ctx = canvas.getContext('2d');
+        const snowflakes = [];
+        let width, height;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function createSnowflake() {
+            const x = Math.random() * width;
+            const y = Math.random() * -height;
+            const size = Math.random() * 3 + 2;
+            const speed = Math.random() * 3 + 1;
+            snowflakes.push({ x, y, size, speed });
+        }
+
+        function drawSnowflakes() {
+            ctx.clearRect(0, 0, width, height);
+            snowflakes.forEach((snowflake, index) => {
+                snowflake.y += snowflake.speed;
+                ctx.beginPath();
+                ctx.arc(snowflake.x, snowflake.y, snowflake.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                // Remove snowflake if it's out of view
+                if (snowflake.y > height) snowflakes.splice(index, 1);
+            });
+        }
+
+        function loop() {
+            createSnowflake();
+            drawSnowflakes();
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>
