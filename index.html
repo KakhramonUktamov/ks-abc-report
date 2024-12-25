@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Power BI Report with Snow Animation</title>
+    <title>Power BI Report with Snowflake Animation</title>
     <style>
-        /* General Page Styles */
         body {
             margin: 0;
             padding: 0;
@@ -15,25 +14,23 @@
             background-color: #ffffff;
         }
 
-        /* Fullscreen iframe for Power BI Report */
         iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: none; /* Remove iframe border */
+            border: none;
         }
 
-        /* Snow Animation Canvas */
         .snow {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Allow interaction with iframe below */
-            z-index: 1000; /* Ensure snow is above everything */
+            pointer-events: none; /* Let iframe interact normally */
+            z-index: 1000;
         }
     </style>
 </head>
@@ -50,10 +47,14 @@
     <canvas class="snow"></canvas>
 
     <script>
-        // Snow Animation JavaScript
         const canvas = document.querySelector('.snow');
         const ctx = canvas.getContext('2d');
         const snowflakes = [];
+        const snowflakeImages = [
+            'https://raw.githubusercontent.com/KakhramonUktamov/ks-abc-report/main/snowflakes1.png',
+            'https://raw.githubusercontent.com/KakhramonUktamov/ks-abc-report/main/snowflakes2.png',
+            'https://raw.githubusercontent.com/KakhramonUktamov/ks-abc-report/main/snowflakes3.png'
+        ];
         let width, height;
 
         // Resize canvas to fit the screen
@@ -64,54 +65,33 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Create star-like snowflakes
+        // Create a snowflake with random properties
         function createSnowflake() {
-            const x = Math.random() * width; // Random horizontal position
-            const y = Math.random() * -height; // Start slightly above the screen
-            const size = Math.random() * 8 + 5; // Varying sizes (5px to 13px)
+            const x = Math.random() * width; // Horizontal position
+            const y = Math.random() * -height; // Start above the screen
+            const size = Math.random() * 20 + 10; // Random size (10px to 30px)
             const speed = Math.random() * 2 + 1; // Medium speed
-            snowflakes.push({ x, y, size, speed });
+            const image = snowflakeImages[Math.floor(Math.random() * snowflakeImages.length)]; // Random snowflake image
+            snowflakes.push({ x, y, size, speed, image });
         }
 
-        // Draw snowflakes with star-like shapes
+        // Draw snowflakes on the canvas
         function drawSnowflakes() {
-            ctx.clearRect(0, 0, width, height); // Clear canvas
+            ctx.clearRect(0, 0, width, height); // Clear the canvas
             snowflakes.forEach((snowflake, index) => {
                 snowflake.y += snowflake.speed; // Move snowflake downward
+                const img = new Image();
+                img.src = snowflake.image;
+                ctx.drawImage(img, snowflake.x, snowflake.y, snowflake.size, snowflake.size);
 
-                // Draw star
-                ctx.beginPath();
-                const spikes = 5; // Number of star spikes
-                const outerRadius = snowflake.size;
-                const innerRadius = snowflake.size / 2;
-                let rotation = Math.PI / 2 * 3; // Start at the top
-                let x = snowflake.x;
-                let y = snowflake.y;
-                ctx.moveTo(x, y - outerRadius);
-
-                for (let i = 0; i < spikes; i++) {
-                    x = snowflake.x + Math.cos(rotation) * outerRadius;
-                    y = snowflake.y + Math.sin(rotation) * outerRadius;
-                    ctx.lineTo(x, y);
-                    rotation += Math.PI / spikes;
-
-                    x = snowflake.x + Math.cos(rotation) * innerRadius;
-                    y = snowflake.y + Math.sin(rotation) * innerRadius;
-                    ctx.lineTo(x, y);
-                    rotation += Math.PI / spikes;
-                }
-                ctx.closePath();
-                ctx.fillStyle = '#ffffff'; // Snowflake color
-                ctx.fill();
-
-                // Remove snowflake if it goes out of the screen
+                // Remove snowflake if it goes out of view
                 if (snowflake.y > height) snowflakes.splice(index, 1);
             });
         }
 
-        // Animation loop for snow
+        // Animation loop
         function loop() {
-            if (Math.random() < 0.02) createSnowflake(); // Control the amount of snowflakes
+            if (Math.random() < 0.02) createSnowflake(); // Spawn snowflakes at controlled rate
             drawSnowflakes();
             requestAnimationFrame(loop);
         }
