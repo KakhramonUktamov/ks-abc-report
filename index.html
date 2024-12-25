@@ -30,7 +30,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none; /* Let iframe interact normally */
-            z-index: 1000;
+            z-index: 1000; /* Ensure snow is above everything */
         }
     </style>
 </head>
@@ -47,14 +47,10 @@
     <canvas class="snow"></canvas>
 
     <script>
+        // Snow Animation JavaScript
         const canvas = document.querySelector('.snow');
         const ctx = canvas.getContext('2d');
         const snowflakes = [];
-        const snowflakeImages = [
-            'https://raw.githubusercontent.com/KakhramonUktamov/ks-abc-report/main/snowflakes1.png',
-            'https://raw.githubusercontent.com/KakhramonUktamov/ks-abc-report/main/snowflakes2.png',
-            'https://raw.githubusercontent.com/KakhramonUktamov/ks-abc-report/main/snowflakes3.png'
-        ];
         let width, height;
 
         // Resize canvas to fit the screen
@@ -65,33 +61,54 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Create a snowflake with random properties
+        // Create star-like snowflakes with varying sizes
         function createSnowflake() {
-            const x = Math.random() * width; // Horizontal position
-            const y = Math.random() * -height; // Start above the screen
-            const size = Math.random() * 20 + 15; // Random size (15px to 35px)
-            const speed = Math.random() * 1.5 + 0.5; // Slower speed (0.5px to 2px per frame)
-            const image = snowflakeImages[Math.floor(Math.random() * snowflakeImages.length)]; // Random snowflake image
-            snowflakes.push({ x, y, size, speed, image });
+            const x = Math.random() * width; // Random horizontal position
+            const y = Math.random() * -height; // Start slightly above the screen
+            const size = Math.random() * 20 + (Math.random() < 0.5 ? 10 : 5); // Mix of smaller (5px) and larger (10px to 30px)
+            const speed = Math.random() * 1.5 + 0.8; // Medium speed (0.8px to 2.3px)
+            snowflakes.push({ x, y, size, speed });
         }
 
-        // Draw snowflakes on the canvas
+        // Draw snowflakes with star-like shapes
         function drawSnowflakes() {
-            ctx.clearRect(0, 0, width, height); // Clear the canvas
+            ctx.clearRect(0, 0, width, height); // Clear canvas
             snowflakes.forEach((snowflake, index) => {
                 snowflake.y += snowflake.speed; // Move snowflake downward
-                const img = new Image();
-                img.src = snowflake.image;
-                ctx.drawImage(img, snowflake.x, snowflake.y, snowflake.size, snowflake.size);
 
-                // Remove snowflake if it goes out of view
+                // Draw star
+                ctx.beginPath();
+                const spikes = 5; // Number of star spikes
+                const outerRadius = snowflake.size;
+                const innerRadius = snowflake.size / 2;
+                let rotation = Math.PI / 2 * 3; // Start at the top
+                let x = snowflake.x;
+                let y = snowflake.y;
+                ctx.moveTo(x, y - outerRadius);
+
+                for (let i = 0; i < spikes; i++) {
+                    x = snowflake.x + Math.cos(rotation) * outerRadius;
+                    y = snowflake.y + Math.sin(rotation) * outerRadius;
+                    ctx.lineTo(x, y);
+                    rotation += Math.PI / spikes;
+
+                    x = snowflake.x + Math.cos(rotation) * innerRadius;
+                    y = snowflake.y + Math.sin(rotation) * innerRadius;
+                    ctx.lineTo(x, y);
+                    rotation += Math.PI / spikes;
+                }
+                ctx.closePath();
+                ctx.fillStyle = '#ffffff'; // Snowflake color
+                ctx.fill();
+
+                // Remove snowflake if it goes out of the screen
                 if (snowflake.y > height) snowflakes.splice(index, 1);
             });
         }
 
-        // Animation loop
+        // Animation loop for snow
         function loop() {
-            if (Math.random() < 0.015) createSnowflake(); // Spawn snowflakes at a controlled rate
+            if (Math.random() < 0.01) createSnowflake(); // Adjust spawn rate (lower = fewer snowflakes)
             drawSnowflakes();
             requestAnimationFrame(loop);
         }
@@ -99,3 +116,4 @@
     </script>
 </body>
 </html>
+
